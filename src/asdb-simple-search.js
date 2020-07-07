@@ -203,5 +203,13 @@ export class AsdbSimpleSearch extends LitElement {
         </div>
     `;
     }
+
+    firstUpdated(changedProperties) {
+        const query = new URL(window.location).searchParams.get("q");
+        if (query) {
+            this.searchString = query;
+            this.runSearch();
+        }
+    }
 }
 
