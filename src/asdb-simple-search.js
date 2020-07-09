@@ -151,7 +151,7 @@ export class AsdbSimpleSearch extends LitElement {
     }
 
     getResultSummary() {
-        if (this.clusters) {
+        if (this.total) {
             return html`<div>Your search gave <strong>${this.total}</strong> results, showing <strong>1</strong> to <strong>${this.clusters.length}</strong>.</div>`;
         }
         return html``;
