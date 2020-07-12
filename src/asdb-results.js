@@ -1,4 +1,5 @@
 import { customElement, property, LitElement, html, css } from 'lit-element';
+import { secmet_styles } from './secmet-styles';
 
 @customElement('asdb-results')
 export class AsdbResults extends LitElement {
@@ -6,7 +7,7 @@ export class AsdbResults extends LitElement {
     clusters = [];
 
     static get styles() {
-        return css`
+        return [css`
         table {
             border-collapse: collapse;
             border-spacing: 0;
@@ -48,7 +49,18 @@ export class AsdbResults extends LitElement {
         .digits {
             text-align: right;
         }
-    `;
+        .badge {
+            display: inline-block;
+            min-width: 10px;
+            padding: 3px 7px;
+            font-weight: bold;
+            vertical-align: middle;
+            text-align: center;
+            whitespace: nowrap;
+            border-radius: 10px;
+            background-color: #bbb;
+        }
+    `, secmet_styles];
     }
 
     showRegion(region) {
@@ -74,7 +86,7 @@ export class AsdbResults extends LitElement {
         return html`
             <tr class="cluster-list" @click=${() => this.showRegion(region)}>
                 <td><a class="link-external" href="https://www.ncbi.nlm.nih.gov/genome/?term=${region.acc}">${region.genus} ${region.species} ${region.strain}</a></td>
-                <td>${region.region_number}</td>
+                <td><span class="badge ${region.term}">${region.region_number}</span></td>
                 <td>${region.edge?'Yes':'No'}</td>
                 <td>${region.description}</td>
                 <td class="digits">${region.start_pos}</td>
