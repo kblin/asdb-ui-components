@@ -16,6 +16,7 @@ export class AsdbResults extends LitElement {
             margin-bottom: 20px;
         }
         table > thead > tr > th {
+            padding: 8px;
             vertical-align: bottom;
             border-bottom: 2px solid #ddd;
             text-align: left;
@@ -69,9 +70,17 @@ export class AsdbResults extends LitElement {
 
     generateClusterBlastHits(region) {
         if (region.cbh_acc) {
+            let color = "rgba(205, 92, 92, 0.3)";
+
+            if (region.similarity > 75) {
+                color = "rgba(0, 100, 0, 0.3)";
+            } else if(region.similarity > 50) {
+                color = "rgba(210, 105, 30, 0.3)";
+            }
+
             return html`
                 <td>${region.cbh_description}</td>
-                <td>${region.similarity}</td>
+                <td class="digits similarity-text" style="background-image: linear-gradient(to left, ${color}, ${color} ${region.similarity}%, #ffffff00 ${region.similarity}%)">${region.similarity}</td>
                 <td><a class="link-external" href="https://mibig.secondarymetabolites.org/go/${region.cbh_acc}">${region.cbh_acc}</a></td>
                 `;
         }
@@ -87,10 +96,10 @@ export class AsdbResults extends LitElement {
             <tr class="cluster-list" @click=${() => this.showRegion(region)}>
                 <td><a class="link-external" href="https://www.ncbi.nlm.nih.gov/genome/?term=${region.acc}">${region.genus} ${region.species} ${region.strain}</a></td>
                 <td><span class="badge ${region.term}">${region.region_number}</span></td>
-                <td>${region.edge?'Yes':'No'}</td>
                 <td>${region.description}</td>
                 <td class="digits">${region.start_pos}</td>
                 <td class="digits">${region.end_pos}</td>
+                <td>${region.edge?'Yes':'No'}</td>
                 ${this.generateClusterBlastHits(region)}
             </tr>
         `;
@@ -104,10 +113,10 @@ export class AsdbResults extends LitElement {
                     <tr>
                         <th>Species</th>
                         <th>Region</th>
-                        <th>Edge</th>
                         <th>Type</th>
                         <th>From</th>
                         <th>To</th>
+                        <th>Edge</th>
                         <th>Most similar MIBiG cluser</th>
                         <th>Similarity</th>
                         <th>MIBiG BGC-ID</th>
