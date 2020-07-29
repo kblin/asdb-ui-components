@@ -3,6 +3,8 @@
   "scripts": {},
   "plugins": [],
   "proxy": {
-      "/api": "http://localhost:5566/api"
+      "/api": "http://localhost:5566/api",
+      "/go": "http://localhost:5566/go",
+      "/output": "https://dev.asdb.secondarymetabolites.org/output"
   }
 }
