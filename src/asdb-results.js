@@ -26,7 +26,7 @@ export class AsdbResults extends LitElement {
         }
         tbody > tr > td {
             padding: 8px;
-            vertical-align: top;
+            vertical-align: center;
             border-top: 1px solid #ddd;
         }
         .cluster-list {
