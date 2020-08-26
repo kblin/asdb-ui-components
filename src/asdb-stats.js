@@ -62,6 +62,7 @@ export class AsdbStats extends LitElement {
             min-width: 10px;
             padding: 3px 7px;
             font-weight: bold;
+            font-size: 12px;
             vertical-align: middle;
             text-align: center;
             whitespace: nowrap;
