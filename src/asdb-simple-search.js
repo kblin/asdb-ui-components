@@ -210,7 +210,7 @@ export class AsdbSimpleSearch extends LitElement {
     `;
     }
 
-    firstUpdated(changedProperties) {
+    firstUpdated() {
         const query = new URL(window.location).searchParams.get("q");
         if (query) {
             this.searchString = query;
