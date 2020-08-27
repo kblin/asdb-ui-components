@@ -93,6 +93,12 @@ export class AsdbSimpleSearch extends LitElement {
         this.searchString = this.shadowRoot.getElementById("search-field").value;
     }
 
+    searchOnEnter(ev) {
+        if (ev && ev.keyCode == 13) {
+            this.runSearch();
+        }
+    }
+
     loadExample() {
         this.searchString = "lanthipeptide Streptomyces";
     }
@@ -178,7 +184,7 @@ export class AsdbSimpleSearch extends LitElement {
         <div class="${this.state != 'input'?'hidden':''}">
             <div class="form">
                 <label for="search-field">Enter your search term:</label>
-                <input id="search-field" type="text" placeholder="e.g. lanthipeptide Streptomyces" @input=${this.onInput} .value=${this.searchString}>
+                <input id="search-field" type="text" placeholder="e.g. lanthipeptide Streptomyces" @input=${this.onInput} @keydown=${this.searchOnEnter} .value=${this.searchString}>
                 <div class="button-group">
                     <button class="search btn-primary" @click=${this.runSearch}>Search</button><button class="example" @click=${this.loadExample}>Load example</button>
                 </div>
