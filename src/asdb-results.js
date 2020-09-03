@@ -95,7 +95,7 @@ export class AsdbResults extends LitElement {
         return html`
             <tr class="cluster-list" @click=${() => this.showRegion(region)}>
                 <td><a class="link-external" href="https://www.ncbi.nlm.nih.gov/genome/?term=${region.acc}">${region.genus} ${region.species} ${region.strain}</a></td>
-                <td><span class="badge ${region.term}">${region.region_number}</span></td>
+                <td><span class="badge ${termToClass(region.term)}">${region.region_number}</span></td>
                 <td>${region.description}</td>
                 <td class="digits">${region.start_pos}</td>
                 <td class="digits">${region.end_pos}</td>
@@ -132,3 +132,9 @@ export class AsdbResults extends LitElement {
     }
 }
 
+function termToClass(term) {
+    if (term.includes(" hybrid")) {
+        return "hybrid";
+    }
+    return term;
+}
