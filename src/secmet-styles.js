@@ -49,11 +49,11 @@ export const secmet_styles = css`
   background-color: #ae00ae;
 }
 
-.nrps, .nrps-like, .cdps, .thioamide-nrp {
+.nrps, .t1nrps, .nrps-like, .cdps, .thioamide-nrp {
   background-color: seagreen;
   color: white;
 }
-.nrps:hover, :hover.nrps-like, :hover.cdps, :hover.thioamide-nrp {
+.nrps:hover, .t1nrps:hover, .nrps-like:hover, .cdps:hover, .thioamide-nrp:hover {
   background-color: #39ad6d;
 }
 
