@@ -81,11 +81,11 @@ export const secmet_styles = css`
   background-color: #ffde2e;
 }
 
-.bacteriocin, .RaS-RiPP, .fungal-RiPP, .linaridin, .cyanobactin, .glycocin, .lassopeptide, .sactipeptide, .bottromycin, .head_to_tail, .microviridin, .proteusin, .lipolanthine, .fused {
+.bacteriocin, .ras-ripp, .fungal-ripp, .linaridin, .cyanobactin, .glycocin, .lassopeptide, .sactipeptide, .bottromycin, .head_to_tail, .microviridin, .proteusin, .lipolanthine, .fused {
   background-color: royalblue;
   color: white;
 }
-.bacteriocin:hover, .RaS-RiPP:hover, .fungal-RiPP:hover, .linaridin:hover, .cyanobactin:hover, .glycocin:hover, .lassopeptide:hover, .sactipeptide:hover, .bottromycin:hover, .head_to_tail:hover, .microviridin:hover, .proteusin:hover, .lipolanthine:hover, .fused:hover {
+.bacteriocin:hover, .ras-ripp:hover, .fungal-ripp:hover, .linaridin:hover, .cyanobactin:hover, .glycocin:hover, .lassopeptide:hover, .sactipeptide:hover, .bottromycin:hover, .head_to_tail:hover, .microviridin:hover, .proteusin:hover, .lipolanthine:hover, .fused:hover {
   background-color: #6988e7;
 }
 
