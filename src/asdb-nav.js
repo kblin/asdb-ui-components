@@ -64,9 +64,9 @@ export class AsdbNav extends LitElement {
                 <ul class="nav">
                     <li><a href="/stats.html"><svg class="icon"><use xlink:href="/images/icons.svg#chart-bar"></use></svg> Statistics</li>
                     <li><a href="/query.html"><svg class="icon"><use xlink:href="/images/icons.svg#search"></use></svg> Query</li>
-                    <li><a href="/browse.html"><svg class="icon"><use xlink:href="/images/icons.svg#compass"></use></svg> Browse</li>
+                    <!-- <li><a href="/browse.html"><svg class="icon"><use xlink:href="/images/icons.svg#compass"></use></svg> Browse</li> -->
                     <li><a href="/about.html"><svg class="icon"><use xlink:href="/images/icons.svg#exclamation"></use></svg> About</li>
-                    <li><a href="/help.html"><svg class="icon"><use xlink:href="/images/icons.svg#question"></use></svg> Help</li>
+                    <!-- <li><a href="/help.html"><svg class="icon"><use xlink:href="/images/icons.svg#question"></use></svg> Help</li> -->
                 </ul>
             </nav>
     `;
