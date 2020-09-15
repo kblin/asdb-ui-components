@@ -99,7 +99,7 @@ export class AsdbResults extends LitElement {
                 <td>${region.description}</td>
                 <td class="digits">${region.start_pos}</td>
                 <td class="digits">${region.end_pos}</td>
-                <td>${region.edge?'Yes':'No'}</td>
+                <td>${region.contig_edge?'Yes':'No'}</td>
                 ${this.generateClusterBlastHits(region)}
             </tr>
         `;
