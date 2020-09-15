@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <link rel="icon" href="/favicon.ico" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link rel="stylesheet" type="text/css" href="/css/index.css" />
+    <title>antiSMASH database</title>
+  </head>
+  <body>
+    <asdb-nav></asdb-nav>
+    <noscript>You need to enable JavaScript to run this website.</noscript>
+    <div class="container">
+      <div class="page-header">
+        <h1>Help</h1>
+      </div>
+        <h2>Terms and abbreviations</h2>
+
+        <p>antiSMASH and thus the antiSMASH database use number of specialised terms and abbreviations. Find an explanation of these terms below.</p>
+
+        <h3>Search categories</h3>
+        <dl>
+          <dt>NCBI RefSeq accession</dt>
+          <dd>DNA record accession from RefSeq (e.g. NC_003888)</dd>
+          <dt>NCBI assembly ID</dt>
+          <dd>ID of an NCBI assembly project (e.g. GCF_000203835)</dd>
+          <dt>BGC type</dt>
+          <dd>Biosynthetic gene cluster type as predicted by antiSMASH (e.g. lanthipeptide)</dd>
+          <dt>Monomer</dt>
+          <dd>Monomer contained in in the cluster product (e.g. athr)</dd>
+          <dt>Biosyntheti</dt>c profile
+          <dd>Hit against one of the pHMMs used by antiSMASH to identify core biosynthetic enzymes (e.g. LANC_like)</dd>
+          <dt>NRPS/PKS domain</dt>
+          <dd>Hit against one of the pHMMs specific to NRPS/PKS domains (e.g. PKS_AT)</dd>
+          <dt>Terpene synthase type</dt>
+          <dd>Hit against a specific terpene synthase type (e.g. STC - seqsquiterpene synthase)</dd>
+          <dt>Terpene cyclisation from C atom</dt>
+          <dt>Terpene cyclisation to C atom</dt>
+          <dd>C atoms in the terpene structure that are being cyclised by the terpene cyclase</dd>
+          <dt>smCoG hit</dt>
+          <dd>Hit against an smCoG profile (e.g. SMCOG1019 - aminotransferase)</dd>
+          <dt>Compound sequence</dt>
+          <dd>Amino acid sequence components of a RiPP product</dd>
+          <dt>RiPP compound class</dt>
+          <dd>Class of the RiPP cluster (e.g. Class I)</dd>
+          <dt>Strain, Species, Genus, Family, Order, Class, Phylum, Superkingdom</dt>
+          <dd>Hit by taxonomic level</dd>
+          <dt>ClusterBlast Hit</dt>
+          <dd>Hit against a given ClusterBlast cluster</dd>
+          <dt>KnownClusterBlast Hit</dt>
+          <dd>Hit against a given MIBiG cluster</dd>
+          <dt>SubClusterBlast Hit</dt>
+          <dd>Hit against a given SubClusterBlast cluster</dd>
+        </dl>
+
+    </div>
+    <asdb-footer></asdb-footer>
+    <script type="module" src="/_dist_/index.js"></script>
+  </body>
+</html>

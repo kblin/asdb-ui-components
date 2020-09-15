@@ -41,6 +41,10 @@ a:hover {
     text-decoration: underline;
 }
 
+dt {
+    font-weight: bold;
+}
+
 .page-header {
     padding-bottom: 8px;
     margin: 40px 0 20px;
