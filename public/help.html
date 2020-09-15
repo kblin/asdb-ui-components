@@ -28,7 +28,7 @@
           <dd>Biosynthetic gene cluster type as predicted by antiSMASH (e.g. lanthipeptide)</dd>
           <dt>Monomer</dt>
           <dd>Monomer contained in in the cluster product (e.g. athr)</dd>
-          <dt>Biosyntheti</dt>c profile
+          <dt>Biosynthetic profile</dt>
           <dd>Hit against one of the pHMMs used by antiSMASH to identify core biosynthetic enzymes (e.g. LANC_like)</dd>
           <dt>NRPS/PKS domain</dt>
           <dd>Hit against one of the pHMMs specific to NRPS/PKS domains (e.g. PKS_AT)</dd>
@@ -52,6 +52,24 @@
           <dt>SubClusterBlast Hit</dt>
           <dd>Hit against a given SubClusterBlast cluster</dd>
         </dl>
+
+        <h2>Example use cases</h2>
+        <p>To help users getting started with antiSMASH DB, here are a number of example use cases.</p>
+
+        <h3>Finding all modular nonribosomal peptide clusters that incorporate hydroxyphenylglycine</h3>
+        <p>
+          On the "Build a query" tab, a user can click the "Add term" button to create a second search term. For the
+          first term, he or she might, e.g., select "BGC type" as category and enter "t1nrps" as the search string. For the
+          second term, he or she could, e.g., select "monomer" as category and enter "hpg" as search string, and hit
+          "search".
+        </p>
+        <img src="images/help_hpg_query.png" alt="Query builder with BGC type t1nrps and monomer hpg search terms"
+        width="100%">
+
+        <p>Currently the database contains 74 regions that match these criteria, those are returned on the results
+        page:</p>
+        <img src="images/help_hpg_results.png" alt="Search results for BGC type t1nrps and monomer hpg search"
+        width="100%">
 
     </div>
     <asdb-footer></asdb-footer>
