@@ -1,4 +1,10 @@
 import { customElement, property, LitElement, html, css } from 'lit-element';
+import $ from 'jquery';
+import './jquery-global';
+//import 'jquery-ui/themes/base/core.css';
+//import 'jquery-ui/themes/base/theme.css';
+//import 'jquery-ui/ui/widgets/sortable';
+import 'jquery-ui-bundle';
 import './asdb-results';
 import { fetchDownload } from './downloader';
 
