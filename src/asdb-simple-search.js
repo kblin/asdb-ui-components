@@ -108,6 +108,12 @@ export class AsdbSimpleSearch extends LitElement {
             search_string: this.searchString,
         };
         this.state = "in-progress";
+        if (history.pushState) {
+            let search = `?q=${this.searchString}`;
+            let newURL = new URL(window.location.href);
+            newURL.search = search;
+            window.history.pushState({ path: newURL.href }, search, newURL.href);
+        }
         fetch("/api/v1.0/search", {
             method: "POST",
             headers: {
