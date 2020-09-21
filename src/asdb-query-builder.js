@@ -217,7 +217,7 @@ export class AsdbQueryBuilder extends LitElement {
         }).then((data) => {
             this.state = "done";
             this.clusters = data.clusters;
-            this.offset = data.offset;
+            this.offset = data.offset + data.paginate;
             this.paginate = data.paginate;
             this.total = data.total;
         });
@@ -240,7 +240,7 @@ export class AsdbQueryBuilder extends LitElement {
             return response.json();
         }).then((data) => {
             this.clusters = this.clusters.concat(data.clusters);
-            this.offset = data.offset;
+            this.offset = data.offset + data.paginate;
             this.paginate = data.paginate;
             this.total = data.total;
             this.loading_more = false;
