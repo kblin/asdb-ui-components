@@ -82,6 +82,9 @@ export class AsdbArea extends LitElement {
     firstUpdated() {
         const params = new URL(window.location).searchParams;
         this.record = params.get("record");
+        if (!this.record) {
+            this.record = params.get("acc");
+        }
         this.start = params.get("start");
         this.end = params.get("end");
         this.runSearch();
