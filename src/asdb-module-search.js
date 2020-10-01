@@ -315,6 +315,9 @@ export class AsdbModuleSearch extends LitElement {
     @property({ type: String })
     state = 'input';
 
+    @property({type: String})
+    error = "";
+
     @property({ type: Number })
     offset = 0;
 
@@ -358,6 +361,9 @@ export class AsdbModuleSearch extends LitElement {
             },
             body: JSON.stringify(this.buildQuery()),
         }).then((response) => {
+            if (!response.ok) {
+                throw new Error(`Network request returned ${response.status}:${response.statusText}`);
+            }
             return response.json();
         }).then((data) => {
             this.state = 'done';
@@ -365,6 +371,11 @@ export class AsdbModuleSearch extends LitElement {
             this.offset = data.offset;
             this.paginate = data.paginate;
             this.total = data.total;
+        }).catch(error => {
+            this.state = "invalid";
+            this.error = error;
+            console.error(error);
+
         });
     }
 
@@ -542,6 +553,9 @@ export class AsdbModuleSearch extends LitElement {
                 <div class="loading-more ${this.loading_more ? '' : 'hidden'}">
                     Loading more results, please wait...
                 </div>
+            </div>
+            <div class="error ${this.state != 'error' ? 'hidden' : ''}">
+                ${this.error}
             </div>
         `;
     }
