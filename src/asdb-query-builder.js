@@ -15,6 +15,9 @@ export class AsdbQueryBuilder extends LitElement {
     @internalProperty({type: String})
     state = "input";
 
+    @property({type: String})
+    error = "";
+
     @property({type: Number})
     offset = 0;
 
@@ -213,6 +216,9 @@ export class AsdbQueryBuilder extends LitElement {
             },
             body: JSON.stringify(request),
         }).then((response) => {
+            if (!response.ok) {
+                throw new Error(`Network request returned ${response.status}:${response.statusText}`);
+            }
             return response.json();
         }).then((data) => {
             this.state = "done";
@@ -220,6 +226,11 @@ export class AsdbQueryBuilder extends LitElement {
             this.offset = data.offset + data.paginate;
             this.paginate = data.paginate;
             this.total = data.total;
+        }).catch(error => {
+            this.state = "error";
+            this.error = error;
+            console.error(error);
+
         });
     }
 
@@ -356,6 +367,9 @@ export class AsdbQueryBuilder extends LitElement {
             <div class="loading-more ${this.loading_more?'':'hidden'}">
                 Loading more results, please wait...
             </div>
+        </div>
+        <div class="error ${this.state != 'error'?'hidden':''}">
+            ${this.error}
         </div>
     `;
     }
