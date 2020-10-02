@@ -425,7 +425,7 @@ export class AsdbModuleSearch extends LitElement {
 
     clearResults() {
         this.offset = 0;
-        this.paginate = 0;
+        this.paginate = 50;
         this.total = 0;
         this.loading_more = false;
         this.state = 'input';
