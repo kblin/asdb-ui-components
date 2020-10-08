@@ -209,7 +209,7 @@ export class AsdbQueryBuilder extends LitElement {
             offset: this.offset,
         };
         this.state = "in-progress";
-        fetch("/api/v1.0/search", {
+        fetch("/api/v2.0/search", {
             method: "POST",
             headers: {
                 "Content-Type": "application/json",
@@ -241,7 +241,7 @@ export class AsdbQueryBuilder extends LitElement {
             paginate: this.paginate,
         };
         this.loading_more = true;
-        fetch("/api/v1.0/search", {
+        fetch("/api/v2.0/search", {
             method: "POST",
             headers: {
                 "Content-Type": "application/json",

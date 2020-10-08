@@ -117,7 +117,7 @@ export class AsdbSimpleSearch extends LitElement {
             newURL.search = search;
             window.history.pushState({ path: newURL.href }, search, newURL.href);
         }
-        fetch("/api/v1.0/search", {
+        fetch("/api/v2.0/search", {
             method: "POST",
             headers: {
                 "Content-Type": "application/json",
@@ -149,7 +149,7 @@ export class AsdbSimpleSearch extends LitElement {
             paginate: this.paginate,
         };
         this.loading_more = true;
-        fetch("/api/v1.0/search", {
+        fetch("/api/v2.0/search", {
             method: "POST",
             headers: {
                 "Content-Type": "application/json",
