@@ -52,6 +52,9 @@ export class AsdbQueryBuilder extends LitElement {
         {id: 'fastaa', desc: 'AA FASTA'},
     ];
 
+    @internalProperty()
+    downloadReturnTypes = new Set(['csv', 'fasta', 'fastaa']);
+
     static get styles() {
         return css`
         .hidden {
@@ -277,10 +280,11 @@ export class AsdbQueryBuilder extends LitElement {
         this.paginate = 50;
         this.total = 0;
         this.loading_more = false;
+        this.clusters = [];
         this.state = "input";
     }
 
-    download() {
+    downloadAsCsv() {
         let request = {
             query: {
                 terms: this.query.terms,
@@ -291,6 +295,18 @@ export class AsdbQueryBuilder extends LitElement {
             offset: 0,
         }
         fetchDownload(request, 'csv');
+    }
+
+    runDownload() {
+        let request = {
+            query: this.query,
+            paginate: this.paginate,
+            offset: this.offset,
+        };
+        this.state = "in-progress";
+        let mime_type = this.query.return_type == 'csv' ? 'csv' : 'fasta';
+        fetchDownload(request, mime_type)
+        this.state = "downloaded";
     }
 
     termsChanged(ev) {
@@ -348,7 +364,10 @@ export class AsdbQueryBuilder extends LitElement {
             </div>
             ${this.query?html`<asdb-query-term .terms="${this.query.terms}" @term-changed="${this.termsChanged}"></asdb-query-term>`:html`Loading...`}
             <div class="button-group">
-                <button class="search btn-primary" @click=${this.runSearch}>Search</button><button class="example" @click=${this.loadExample}>Load example</button>
+                ${this.query && this.downloadReturnTypes.has(this.query.return_type) ?
+                html`<button class="search btn-primary" @click=${this.runDownload}>Download</button>` :
+                html`<button class="search btn-primary" @click=${this.runSearch}>Search</button>`}
+                <button class="example" @click=${this.loadExample}>Load example</button>
             </div>
         </div>
         <div class="in-progress ${this.state != 'in-progress'?'hidden':''}">
@@ -356,7 +375,7 @@ export class AsdbQueryBuilder extends LitElement {
         </div>
         <div class="results ${this.state != 'done'?'hidden':''}">
             <div class="button-group">
-                <button class="download btn-primary" @click=${this.download}><svg class="icon"><use xlink:href="/images/icons.svg#download"></use></svg> Download results</button>
+                <button class="download btn-primary" @click=${this.downloadAsCsv}><svg class="icon"><use xlink:href="/images/icons.svg#download"></use></svg> Download results</button>
                 <button class="new-search" @click=${this.clearResults}>New search</button>
             </div>
             ${this.getResultSummary()}
@@ -368,7 +387,16 @@ export class AsdbQueryBuilder extends LitElement {
                 Loading more results, please wait...
             </div>
         </div>
+        <div class="error ${this.state != 'downloaded'?'hidden':''}">
+            <div class="button-group">
+                <button class="new-search" @click=${this.clearResults}>New search</button>
+            </div>
+            Your download should begin shortly.
+        </div>
         <div class="error ${this.state != 'error'?'hidden':''}">
+            <div class="button-group">
+                <button class="new-search" @click=${this.clearResults}>New search</button>
+            </div>
             ${this.error}
         </div>
     `;
