@@ -434,8 +434,15 @@ export class AsdbQueryBuilder extends LitElement {
         const terms = searchParams.get("terms");
         const search_type = searchParams.get("search_type");
         const return_type = searchParams.get("return_type");
-        const offset = parseInt(searchParams.get("offset"));
-        const paginate = parseInt(searchParams.get("paginate"));
+        let offset = parseInt(searchParams.get("offset"));
+        let paginate = parseInt(searchParams.get("paginate"));
+
+        if (isNaN(offset)) {
+            offset = this.offset;
+        }
+        if (isNaN(paginate)) {
+            paginate = this.paginate;
+        }
 
         if (terms) {
             let convertUrl = new URL("/api/v1.0/convert", window.location);
