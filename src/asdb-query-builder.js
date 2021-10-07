@@ -338,7 +338,7 @@ export class AsdbQueryBuilder extends LitElement {
 
     searchChanged() {
         if (history.pushState) {
-            let search = `?terms=${encodeURIComponent(stringifyTerm(this.query.terms))}&search_type=${this.query.search}&return_type=${this.query.return_type}`;
+            let search = `?terms=${encodeURIComponent(stringifyTerm(this.query.terms))}&search_type=${this.query.search}&return_type=${this.query.return_type}&offset=${this.offset}&paginate=${this.paginate}`;
             let newURL = new URL(window.location.href);
             newURL.search = search;
             window.history.pushState({ path: newURL.href }, search, newURL.href);
@@ -434,6 +434,8 @@ export class AsdbQueryBuilder extends LitElement {
         const terms = searchParams.get("terms");
         const search_type = searchParams.get("search_type");
         const return_type = searchParams.get("return_type");
+        const offset = parseInt(searchParams.get("offset"));
+        const paginate = parseInt(searchParams.get("paginate"));
 
         if (terms) {
             let convertUrl = new URL("/api/v1.0/convert", window.location);
@@ -450,9 +452,8 @@ export class AsdbQueryBuilder extends LitElement {
 
             this.query = query;
 
-            // TODO: Also encode this in the URL?
-            this.paginate = 50;
-            this.offset = 0;
+            this.paginate = paginate;
+            this.offset = offset;
             this.runSearch();
 
         } else {
@@ -465,8 +466,8 @@ export class AsdbQueryBuilder extends LitElement {
                 search: 'cluster',
                 return_type: 'json',
             };
-            this.paginate = 50;
-            this.offset = 0;
+            this.paginate = paginate;
+            this.offset = offset;
         }
     }
 }
