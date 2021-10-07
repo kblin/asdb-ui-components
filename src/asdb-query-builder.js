@@ -476,6 +476,9 @@ function stringifyTerm(term) {
         return "INVALID";
     }
     if (term.term_type == "expr") {
+        if (!term.category || !term.term) {
+            return "";
+        }
         return `[${term.category}]${term.term}`;
     }
     return `( ${stringifyTerm(term.left)} ${term.operation} ${stringifyTerm(term.right)} )`;
