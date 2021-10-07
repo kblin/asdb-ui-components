@@ -183,6 +183,12 @@ export class AsdbQueryBuilder extends LitElement {
             flex-flow: row no-wrap;
             flex: 1 0 auto;
         }
+        .pagination-options {
+            display: flex;
+            justify-content: space-around;
+            flex-flow: row no-wrap;
+            flex: 1 0 auto;
+        }
     `;
     }
 
@@ -339,6 +345,14 @@ export class AsdbQueryBuilder extends LitElement {
         }
     }
 
+    paginateChanged(ev) {
+        this.paginate = ev.target.value;
+    }
+
+    offsetChanged(ev) {
+        this.offset = ev.target.value;
+    }
+
     render() {
         return html`
         <div class="pattern-list ${this.state != 'input'?'hidden':''}">
@@ -361,8 +375,21 @@ export class AsdbQueryBuilder extends LitElement {
                         })}
                     </div>
                 </div>
+
             </div>
             ${this.query?html`<asdb-query-term .terms="${this.query.terms}" @term-changed="${this.termsChanged}"></asdb-query-term>`:html`Loading...`}
+            <div class="${this.query && this.downloadReturnTypes.has(this.query.return_type) ? '': 'hidden'}">
+                <div class="pagination-options">
+                    <div class="paginate">
+                        <label class="form-control" for="paginate-input">Limit results:</label>
+                        <input id="paginate-input" type="number" .value="${this.paginate}" @change="${this.paginateChanged}"/>
+                    </div>
+                    <div class="offset">
+                        <label class="form-control" for="offset-input">Offset:</label>
+                        <input id="offset-input" type="number" .value="${this.offset}" @change="${this.offsetChanged}"/>
+                    </div>
+                </div>
+            </div>
             <div class="button-group">
                 ${this.query && this.downloadReturnTypes.has(this.query.return_type) ?
                 html`<button class="search btn-primary" @click=${this.runDownload}>Download</button>` :
