@@ -230,9 +230,6 @@ export class AsdbQueryTerm extends LitElement {
                 <option label="Monomer" value="monomer">Monomer</option>
                 <option label="Biosynthetic profile" value="profile">Biosynthetic profile</option>
                 <option label="NRPS/PKS domain" value="asdomain">NRPS/PKS domain</option>
-                <option label="Terpene synthase type" value="terpene">Terpene synthase type</option>
-                <option label="Terpene cyclisation from carbon atom" value="terpenefromcarbon">Terpene cyclisation from carbon atom</option>
-                <option label="Terpene cyclisation to carbon atom" value="terpenetocarbon">Terpene cyclisation to carbon atom</option>
                 <option label="smCoG hit" value="smcog">smCoG hit</option>
             </optgroup>
             <optgroup label="Compound properties">
