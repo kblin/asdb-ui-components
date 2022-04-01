@@ -372,7 +372,7 @@ export class AsdbModuleSearch extends LitElement {
             this.paginate = data.paginate;
             this.total = data.total;
         }).catch(error => {
-            this.state = "invalid";
+            this.state = "error";
             this.error = error;
             console.error(error);
 
