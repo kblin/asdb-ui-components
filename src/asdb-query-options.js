@@ -43,8 +43,7 @@ export class AsdbQueryOptions extends LitElement {
     render() {
         return html`
         <ul>
-            <li><a class="${this.isActive('simple')}" href="/query.html">Simple search</a></li>
-            <li><a class="${this.isActive('builder')}" href="/query_builder.html">Build a query</a></li>
+            <li><a class="${this.isActive('builder')}" href="/query.html">Build a query</a></li>
             <li><a class="${this.isActive('module')}" href="/query_module.html">NRPS/PKS module query</a></li>
         </ul>
     `;
