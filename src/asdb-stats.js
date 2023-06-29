@@ -121,7 +121,7 @@ export class AsdbStats extends LitElement {
     }
 
     clusterStatEntry(stat) {
-        return html`<li class="list-group-item"><a href="/query.html?q=[type]${stat.name}">${stat.description}</a><span class="badge ${stat.name}">${stat.count}</span></li>`;
+        return html`<li class="list-group-item"><a href="/query.html?q=[type]${stat.name}">${stat.description}</a><span class="badge ${stat.category} ${stat.name}">${stat.count}</span></li>`;
     }
 
     render() {

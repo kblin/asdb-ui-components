@@ -9,11 +9,11 @@ export const secmet_styles = css`
   background-color: #d0dcec;
 }
 
-.t1pks, .transat-pks, .transat-pks-like, .t2pks, .t3pks, .hgle-ks, .ppys-ks, .pks-like {
+.t1pks, .transat-pks, .transat-pks-like, .t2pks, .t3pks, .hgle-ks, .ppys-ks, .pks-like, .pks {
   background-color: sandybrown;
   color: purple;
 }
-.t1pks:hover, .transat-pks:hover, .transat-pks-like:hover, .t2pks:hover, .t3pks:hover, .hgle-ks:hover, .ppys-ks:hover, .pks-like:hover {
+.t1pks:hover, .transat-pks:hover, .transat-pks-like:hover, .t2pks:hover, .t3pks:hover, .hgle-ks:hover, .ppys-ks:hover, .pks-like:hover, .pks:hover {
   background-color: #f7bd8b;
 }
 
@@ -65,7 +65,16 @@ export const secmet_styles = css`
   background-color: #ae00ae;
 }
 
-.lanthipeptide, .lanthidin {
+
+.ripp, .ras-ripp, .fungal-ripp, .linaridin, .cyanobactin, .glycocin, .lassopeptide, .sactipeptide, .bottromycin, .head_to_tail, .microviridin, .proteusin, .lipolanthine, .fused, .ripp-like {
+  background-color: royalblue;
+  color: white;
+}
+.ripp:hover, .ras-ripp:hover, .fungal-ripp:hover, .linaridin:hover, .cyanobactin:hover, .glycocin:hover, .lassopeptide:hover, .sactipeptide:hover, .bottromycin:hover, .head_to_tail:hover, .microviridin:hover, .proteusin:hover, .lipolanthine:hover, .fused:hover, .ripp-like:hover {
+  background-color: #6988e7;
+}
+
+.lanthipeptide, .lanthidin, .lanthipeptide-class-i, .lanthipeptide-class-ii, .lanthipeptide-class-iii, .lanthipeptide-class-iv, .lanthipeptide-class-v, .lipolanthin {
   background-color: #ffff77;
   color: blue;
 }
@@ -79,14 +88,6 @@ export const secmet_styles = css`
 }
 .thiopeptide:hover, .lap:hover, .tfua-related:hover {
   background-color: #ffde2e;
-}
-
-.bacteriocin, .ras-ripp, .fungal-ripp, .linaridin, .cyanobactin, .glycocin, .lassopeptide, .sactipeptide, .bottromycin, .head_to_tail, .microviridin, .proteusin, .lipolanthine, .fused {
-  background-color: royalblue;
-  color: white;
-}
-.bacteriocin:hover, .ras-ripp:hover, .fungal-ripp:hover, .linaridin:hover, .cyanobactin:hover, .glycocin:hover, .lassopeptide:hover, .sactipeptide:hover, .bottromycin:hover, .head_to_tail:hover, .microviridin:hover, .proteusin:hover, .lipolanthine:hover, .fused:hover {
-  background-color: #6988e7;
 }
 
 .blactam {
