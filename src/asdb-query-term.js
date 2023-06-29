@@ -1,10 +1,71 @@
-import { customElement, LitElement, html, css } from 'lit-element';
+import { customElement, LitElement, html, css, internalProperty } from 'lit-element';
 
 import autocomplete from 'autocompleter';
 import 'autocompleter/autocomplete.css';
 
+import './asdb-query-filter';
+
+
+export class AsdbQueryFilter {
+    constructor(name = "", value = "", operator = "") {
+        this.name = name;
+        this.operand = value;
+        this.operator = operator;
+    }
+
+    stringify() {
+        return `WITH [${this.name}](${this.operator} ${this.operand})`;
+    }
+}
+
+
+export class AsdbQueryBase {
+    constructor(termType) {
+        this.termType = termType;
+        this.isRealClass = true;
+    }
+
+    stringify() {
+        1();
+    }
+}
+
+export class AsdbQueryOperator extends AsdbQueryBase {
+    constructor(kind, left, right) {
+        super("op");
+        this.kind = kind;
+        this.left = left;
+        this.right = right;
+    }
+
+    swap() {
+        let tmp = this.left;
+        this.left = this.right;
+        this.right = tmp;
+    }
+
+    stringify() {
+        return `( ${this.left.stringify()} ${this.kind} ${this.right.stringify()} )`;
+    }
+}
+
+export class AsdbQueryOperand extends AsdbQueryBase {
+    constructor(category = "", count = 1, value = "", filters = []) {
+        super("expr");
+        this.category = category;
+        this.value = value;
+        this.filters = filters;
+        this.count = count;
+    }
+
+    stringify() {
+        return `${this.count > 1 ? this.count : ""}[${this.category}]{${this.value} ${this.filters.map(filter => filter.stringify()).join(" ")}}`;
+    }
+}
+
+
 @customElement('asdb-query-term')
-export class AsdbQueryTerm extends LitElement {
+export class AsdbQueryTermView extends LitElement {
     static get properties() {
         return {
             terms: {
@@ -14,22 +75,33 @@ export class AsdbQueryTerm extends LitElement {
                     return JSON.stringify(newVal) !== JSON.stringify(oldVal);
                 },
             },
+            categories: {
+                type: Object,
+                reflect: true,
+                hasChanged: (newVal, oldVal) => {
+                    return JSON.stringify(newVal) !== JSON.stringify(oldVal);
+                },
+            }
         };
     }
 
+    @internalProperty({type: Boolean})
+    apply_filters = false;
+
     constructor() {
         super();
-        this.terms = {
-            term_type: "expr",
-            category: "",
-            term: "",
-        };
+        this.terms = new AsdbQueryOperand();
     }
 
     static get styles() {
         return css`
         .expression {
             width: 40%;
+        }
+        div.expression {
+            display: inline-block;
+            padding-left: 4px;
+            padding-right: 4px;
         }
         button, .btn {
             display: inline-block;
@@ -103,8 +175,7 @@ export class AsdbQueryTerm extends LitElement {
         }
         li:last-child {
             margin-bottom: 0;
-            border-bottom-right-radius: 4px;
-            border-bottom-left-radius: 4px;
+            radius: 4px;
         }
         .term {
             justify-content: space-between;
@@ -117,11 +188,15 @@ export class AsdbQueryTerm extends LitElement {
         asdb-query-term {
             width: 80%;
         }
+        .filter-item {
+            display: inline-block;
+            padding: 6px 12px;
+        }
         select {
             display: inline-block;
             width: auto;
             border: 1px solid #aaa;
-            padding: 6px 12px;
+            padding: 6px 20px 6px 12px;
             font-size: 14px;
             border-radius: 4px;
             -moz-appearance: none;
@@ -134,8 +209,6 @@ export class AsdbQueryTerm extends LitElement {
             box-shadow: inset 0 1px 3px rgba(0,0,0,0.05),0 1px 0 rgba(255,255,255,0.1);
         }
         select:hover {
-            background-color: #bebebe;
-            background-position: right .5em top 50%, 0 -15px;
             box-shadow: inset 0 1px 5px rgba(0,0,0,0.05),0 1px 0 rgba(255,255,255,0.1);
         }
         .icon {
@@ -146,9 +219,7 @@ export class AsdbQueryTerm extends LitElement {
     }
 
     swap() {
-        let tmp = this.terms.left;
-        this.terms.left = this.terms.right;
-        this.terms.right = tmp;
+        this.terms.swap();
         this.termChanged();
         this.requestUpdate();
     }
@@ -160,22 +231,66 @@ export class AsdbQueryTerm extends LitElement {
     }
 
     formTermChanged(ev) {
-        this.terms.term = ev.target.value;
+        this.terms.value = ev.target.value;
         this.termChanged();
         this.requestUpdate();
     }
 
     addTerm() {
-        this.terms = {
-            term_type: "op",
-            operation: "AND",
-            left: this.terms,
-            right: {
-                term_type: "expr",
-                category: "",
-                term: "",
-            },
-        };
+        this.terms = new AsdbQueryOperator("AND", this.terms, new AsdbQueryOperand());
+        this.termChanged();
+        this.requestUpdate();
+    }
+
+    toggleFilters() {
+        this.apply_filters = !this.apply_filters;
+    }
+
+    addFilter() {
+        this.terms.filters = [...this.terms.filters, new AsdbQueryFilter()];
+        this.termChanged();
+        this.requestUpdate();
+    }
+
+    filterChanged(idx, value) {
+        console.log("filter changed", value);
+        this.terms.filters = this.terms.filters.map((filter, i) => {
+            if (i == idx) {
+                filter.name = value;
+            }
+            return filter;
+        });
+        this.termChanged();
+        this.requestUpdate();
+    }
+
+    removeFilter(idx) {
+        this.terms.filters = this.terms.filters.filter((_, i) => i !== idx);
+        this.termChanged();
+        this.requestUpdate();
+    }
+
+    operatorChanged(idx, value) {
+        console.log("op changed", value);
+        this.terms.filters = this.terms.filters.map((filter, i) => {
+            if (i == idx) {
+                filter.operator = value;
+            }
+            return filter;
+        });
+        this.termChanged();
+        this.requestUpdate();
+    }
+
+
+    operandChanged(idx, value) {
+        console.log("value changed", value);
+        this.terms.filters = this.terms.filters.map((filter, i) => {
+            if (i == idx) {
+                filter.operand = value;
+            }
+            return filter;
+        });
         this.termChanged();
         this.requestUpdate();
     }
@@ -222,44 +337,141 @@ export class AsdbQueryTerm extends LitElement {
     renderType() {
         return html`
         <select .value="${this.terms.category}" @change=${this.formCategoryChanged}>
-            <option label="--- Select a category ---" value="" selected="selected">--- Select a category</option>
-            <option label="NCBI RefSeq Accession" value="acc">NCBI RefSeq Accession</option>
-            <option label="NCBI assembly ID" value="assembly">NCBI assembly ID</option>
-            <optgroup label="antiSMASH predictions">
-                <option label="BGC type" value="type">BGC type</option>
-                <option label="Monomer" value="monomer">Monomer</option>
-                <option label="Biosynthetic profile" value="profile">Biosynthetic profile</option>
-                <option label="NRPS/PKS domain" value="asdomain">NRPS/PKS domain</option>
-                <option label="smCoG hit" value="smcog">smCoG hit</option>
-            </optgroup>
-            <optgroup label="Compound properties">
-                <option label="Compound sequence" value="compoundseq">Compound sequence</option>
-                <option label="RiPP Compound class" value="compoundclass">RiPP Compound class</option>
-            </optgroup>
-            <optgroup label="Quality filters">
-                <option label="Cluster on contig edge" value="contigedge">Cluster on contig edge</option>
-                <option label="Cluster with minimal predictions" value="minimal">Cluster with minimal predictions</option>
-            </optgroup>
-            <optgroup label="Taxonomy">
-                <option label="Strain" value="strain">Strain</option>
-                <option label="Species" value="species">Species</option>
-                <option label="Genus" value="genus">Genus</option>
-                <option label="Family" value="family">Family</option>
-                <option label="Order" value="order">Order</option>
-                <option label="Class" value="class">Class</option>
-                <option label="Phylum" value="phylum">Phylum</option>
-                <option label="Superkingdom" value="superkingdom">Superkingdom</option>
-            </optgroup>
-            <optgroup label="Similar clusters">
-                <option label="ClusterBlast hit" value="clusterblast">ClusterBlast hit</option>
-                <option label="KnownClusterBlast hit" value="knowncluster">KnownClusterBlast hit</option>
-                <option label="SubClusterBlast hit" value="subcluster">SubClusterBlast hit</option>
-            </optgroup>
+            <option label="--- Select a category ---" value="">--- Select a category</option>
+            ${this.renderPlainOptions(this.categories.order)}
+            ${this.renderOptionGroups()}
         </select>`;
+
+    }
+
+    renderOption(option) {
+        return html`<option .label="${option.label}" .value="${option.value}" ?selected=${option.value == this.terms.category}>${option.label}</option>`;
+    }
+
+    renderPlainOptions(group) {
+        if (!group) {
+            return html``;
+        }
+        return html`${group.options.map((option) =>
+            this.renderOption(option)
+        )}`;
+    }
+
+    renderOptionGroups() {
+        if (!this.categories) {
+            return html``;
+        }
+        return html`${this.categories.order.groups.map((group) =>
+            html`<optgroup label="${group.header}">${this.renderPlainOptions(group)}</optgroup>`
+        )}`
     }
 
     renderTerm() {
-        return html`<input type="text" class="expression" placeholder="${this.terms.category == ""?"Select placeholder":""}" ?disabled="${this.terms.category == ""}" .value="${this.terms.term}" @change=${this.formTermChanged}>`;
+        let termType = this.categories.mappings[this.terms.category];
+        switch(termType?.type) {
+            case "bool":
+                return html`<div class="expression">is true</div>`;
+            case "text":
+                return html`<input type="text" class="expression" placeholder="Please enter value" .value="${this.terms.value}" @change=${this.formTermChanged}>`;
+            case "numeric":
+                return html`<input type="number" class="expression" .value="${this.terms.value}" @change=${this.formTermChanged}>`;
+            default:
+                return html`<input type="text" class="expression" placeholder="Select a category first" disabled>`;
+        }
+    }
+
+    filtersForCategory() {
+        let termType = this.categories.mappings[this.terms.category];
+        if (!termType || !termType.filters) {
+            return [];
+        }
+        return termType.filters;
+    }
+
+    renderFilterButton() {
+        if (this.filtersForCategory().length == 0) {
+            return '';
+        }
+        return html`
+            <label @click="${() => this.toggleFilters()}" class="btn ${this.apply_filters ?"active":""}"><svg class="icon"><use xlink:href="/images/icons.svg#filter"></use></svg>Filters</label>
+        `;
+    }
+
+    renderFilters() {
+        if (!this.apply_filters) {
+            return '';
+        }
+
+        let available = this.filtersForCategory();
+        let type_map = {};
+        available.map((opt) => type_map[opt.name] = {type: opt.type, labels: opt.labels});
+
+        return html`
+            <ul>
+                ${this.terms.filters.map((filter, idx) => html`
+                    ${this.renderFilter(idx)}
+                `)}
+                <li @click="${this.addFilter}">Add filter</li>
+            </ul>
+        `;
+    }
+
+    renderFilter(idx) {
+        let available = this.filtersForCategory();
+        console.log("render filter before map", available);
+        let type_map = {};
+        available.map((opt) => type_map[opt.value] = {type: opt.type, labels: opt.choices});
+        return html`
+            <li>
+                <div class="filter-item">WITH</div>
+                <select .value="${this.terms.filters[idx].value}" @change="${(ev) => this.filterChanged(idx, ev.target.value)}">
+                    <option label="Select filter" value=""></option>
+                    ${available.map((opt) => html`<option .label="${opt.label}" .value="${opt.value}">${opt.label}</option>`)}
+                </select>
+                ${this.renderFilterValue(idx, type_map)}
+                <button class="remove" @click="${() => this.removeFilter(idx)}"><svg class="icon"><use xlink:href="/images/icons.svg#trash"></use></svg> Remove filter</button>
+            </li>
+        `;
+
+    }
+
+    renderFilterValue(idx, type_map) {
+        let filter = this.terms.filters[idx];
+        console.log("rendering", filter, idx, type_map);
+        switch(type_map[filter.name]?.type) {
+            case "numeric":
+                return html`
+                <select .value="${filter.operator}" @change="${(ev) => this.operatorChanged(idx, ev.target.value)}">
+                    <option label="pick one" value=""></option>
+                    <option label="greater than" value=">"></option>
+                    <option label="greater than or equal to" value=">="></option>
+                    <option label="equal to" value="="></option>
+                    <option label="less than or equal to" value="<="></option>
+                    <option label="less than" value="<">
+                </select>
+                ${this.renderNumericOperand(idx, type_map)}
+                `;
+            case "text":
+                return html`<input type="text" class="expression" .value="${filter.operand}" @change="${(ev) => this.operandChanged(idx, ev.target.value)}">`;
+            default:
+                return '';
+        }
+    }
+
+    renderNumericOperand(idx, type_map) {
+        let filter = this.terms.filters[idx];
+        console.log("render numeric operand", filter, idx, type_map);
+        let labels = type_map[filter.name]?.labels;
+        if (!labels) {
+            return html`<input type="number" class="expression" .value="${filter.operand}" @change="${(ev) => this.operandChanged(idx, ev.target.value)}">`;
+        }
+        console.log("labels", labels);
+        return html`
+            <select class="expression" .value="${filter.operand}" @change="${(ev) => this.operandChanged(idx, ev.target.value)}">
+                <option label="pick one" value=""></option>
+                ${Object.entries(labels).map((it) => html`<option .label="${it[0]}" .value="${it[1]}">${it[0]}</option>`)}
+            </select>
+        `;
     }
 
     renderExpression() {
@@ -267,36 +479,44 @@ export class AsdbQueryTerm extends LitElement {
             <div>
                 ${this.renderType()} ${this.renderTerm()}
                  <button @click=${this.addTerm}><svg class="icon"><use xlink:href="/images/icons.svg#plus"></use></svg> Add term</button>
+                ${this.renderFilterButton()} ${this.renderFilters()}
             </div>
-            `
+            `;
     }
 
     renderOp() {
         return html`
         <ul class="operation-group">
-            <li class="term"><asdb-query-term .terms="${this.terms.left}" @term-changed="${this.changedTermLeft}"></asdb-query-term> ${this.terms.left.term_type == "expr"?html`<button class="remove" @click="${this.removeLeft}"><svg class="icon"><use xlink:href="/images/icons.svg#trash"></use></svg> Remove term</button>`:html``}</li>
+            <li class="term"><asdb-query-term .terms="${this.terms.left}" @term-changed="${this.changedTermLeft}" .categories="${this.categories}"></asdb-query-term> ${this.terms.left.termType == "expr"?html`<button class="remove" @click="${this.removeLeft}"><svg class="icon"><use xlink:href="/images/icons.svg#trash"></use></svg> Remove term</button>`:html``}</li>
             <li class="operation">
                 <div class="button-group">
-                    <label @click="${() => this.changeOperation("AND")}" class="btn ${this.terms.operation == "AND"?"active":""}">AND</label>
-                    <label @click="${() => this.changeOperation("OR")}" class="btn ${this.terms.operation == "OR"?"active":""}">OR</label>
-                    <label @click="${() => this.changeOperation("EXCEPT")}" class="btn ${this.terms.operation == "EXCEPT"?"active":""}">EXCEPT</btn></div>
+                    <label @click="${() => this.changeOperation("AND")}" class="btn ${this.terms.kind.toLowerCase() == "and"?"active":""}">AND</label>
+                    <label @click="${() => this.changeOperation("OR")}" class="btn ${this.terms.kind.toLowerCase() == "or"?"active":""}">OR</label>
+                    <label @click="${() => this.changeOperation("EXCEPT")}" class="btn ${this.terms.kind.toLowerCase() == "except"?"active":""}">EXCEPT</label>
+                </div>
                 <button @click="${this.swap}"><svg class="icon"><use xlink:href="/images/icons.svg#exchange"></use></svg> Swap terms</button>
             </li>
-            <li class="term"><asdb-query-term .terms="${this.terms.right}" @term-changed="${this.changedTermRight}"></asdb-query-term>${this.terms.right.term_type == "expr"?html`<button class="remove" @click="${this.removeRight}"><svg class="icon"><use xlink:href="/images/icons.svg#trash"></use></svg> Remove term</button>`:html``}</li>
+            <li class="term"><asdb-query-term .terms="${this.terms.right}" @term-changed="${this.changedTermRight}" .categories="${this.categories}"></asdb-query-term>${this.terms.right.termType == "expr"?html`<button class="remove" @click="${this.removeRight}"><svg class="icon"><use xlink:href="/images/icons.svg#trash"></use></svg> Remove term</button>`:html``}</li>
         </ul>
         `;
     }
 
     render() {
+        console.log("render", this.terms);
         return html`
             <div>
                 ${this.terms?
-                    this.terms.term_type == "expr"?
+                    this.terms.termType == "expr"?
                     this.renderExpression():
                     this.renderOp()
                   :html`Loading...`}
             </div>
             `;
+    }
+
+    stringify() {
+        console.log("stringinginging", this.terms);
+        return this.terms.stringify();
     }
 
     firstUpdated() {
@@ -305,6 +525,7 @@ export class AsdbQueryTerm extends LitElement {
             autocomplete({
                 input: input,
                 fetch: (text, update) => {
+                    console.log(text);
                     text = text.toLowerCase();
                     fetch(`/api/v1.0/available/${this.terms.category}/${text}`).then(response => {
                         return response.json();

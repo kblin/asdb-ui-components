@@ -3,6 +3,7 @@ import { customElement, property, LitElement, html, css, internalProperty } from
 import './asdb-query-term';
 import './asdb-results';
 import { fetchDownload } from './downloader';
+import { AsdbQueryOperand, AsdbQueryOperator } from './asdb-query-term';
 
 @customElement('asdb-query-builder')
 export class AsdbQueryBuilder extends LitElement {
@@ -54,6 +55,16 @@ export class AsdbQueryBuilder extends LitElement {
 
     @internalProperty()
     downloadReturnTypes = new Set(['csv', 'fasta', 'fastaa']);
+
+    @internalProperty({type: Boolean})
+    show_text_mode = true;
+
+    @internalProperty({type: Object})
+    categories = {
+        order: null,
+        mappings: {},
+    };
+
 
     static get styles() {
         return css`
@@ -189,24 +200,16 @@ export class AsdbQueryBuilder extends LitElement {
             flex-flow: row no-wrap;
             flex: 1 0 auto;
         }
+        .text-mode-input {
+            width: 80%;
+        }
     `;
     }
 
     loadExample() {
-        this.query.terms = {
-            term_type: "op",
-            operation: "AND",
-            left: {
-                term_type: "expr",
-                category: "type",
-                term: "nrps",
-            },
-            right: {
-                term_type: "expr",
-                category: "genus",
-                term: "streptomyces",
-            },
-        };
+        let left = new AsdbQueryOperand("type", 1, "nrps");
+        let right = new AsdbQueryOperand("genus", 1, "streptomyces");
+        this.query.terms = new AsdbQueryOperator("AND", left, right);
         this.searchChanged();
         this.requestUpdate();
     }
@@ -337,8 +340,9 @@ export class AsdbQueryBuilder extends LitElement {
     }
 
     searchChanged() {
+        return; // TODO: Remove this once stringification is fixed
         if (history.pushState) {
-            let search = `?terms=${encodeURIComponent(stringifyTerm(this.query.terms))}&search_type=${this.query.search}&return_type=${this.query.return_type}&offset=${this.offset}&paginate=${this.paginate}`;
+            let search = `?terms=${encodeURIComponent(this.stringified_query)}&search_type=${this.query.search}&return_type=${this.query.return_type}&offset=${this.offset}&paginate=${this.paginate}`;
             let newURL = new URL(window.location.href);
             newURL.search = search;
             window.history.pushState({ path: newURL.href }, search, newURL.href);
@@ -353,6 +357,27 @@ export class AsdbQueryBuilder extends LitElement {
         this.offset = ev.target.value;
     }
 
+    toggleTextMode() {
+        this.show_text_mode = !this.show_text_mode;
+    }
+
+    async textModeUpdated(ev) {
+        let terms = ev.target.value;
+        let convertUrl = new URL("/api/v1.0/convert", window.location);
+        convertUrl.searchParams.set("search_string", terms);
+        let response = await fetch(convertUrl);
+        let query = await response.json();
+
+        this.query = query;
+        this.searchChanged();
+        this.requestUpdate();
+    }
+
+    get _term() {
+        return this.renderRoot?.querySelector("asdb-query-term") ?? null;
+    }
+
+
     render() {
         return html`
         <div class="pattern-list ${this.state != 'input'?'hidden':''}">
@@ -360,7 +385,7 @@ export class AsdbQueryBuilder extends LitElement {
                 <div class="search-options">
                     <label class="form-control">Search:</label>
                     <div class="btn-group">
-                        ${this.searchTypes.map(stype => 
+                        ${this.searchTypes.map(stype =>
                             html`<label @click="${() => this.searchTypeChanged(stype.id)}" class="btn btn-info${this.query && this.query.search == stype.id?" active":""}">${stype.desc}</label>`)}
                     </div>
                 </div>
@@ -377,7 +402,7 @@ export class AsdbQueryBuilder extends LitElement {
                 </div>
 
             </div>
-            ${this.query?html`<asdb-query-term .terms="${this.query.terms}" @term-changed="${this.termsChanged}"></asdb-query-term>`:html`Loading...`}
+            ${this.query?html`<asdb-query-term .terms="${this.query.terms}" @term-changed="${this.termsChanged}" .categories="${this.categories}"></asdb-query-term>`:html`Loading...`}
             <div class="${this.query && this.downloadReturnTypes.has(this.query.return_type) ? '': 'hidden'}">
                 <div class="pagination-options">
                     <div class="paginate">
@@ -388,6 +413,16 @@ export class AsdbQueryBuilder extends LitElement {
                         <label class="form-control" for="offset-input">Offset:</label>
                         <input id="offset-input" type="number" .value="${this.offset}" @change="${this.offsetChanged}"/>
                     </div>
+                </div>
+            </div>
+            <div>
+                <span @click=${this.toggleTextMode}>
+                    <svg class="icon ${this.show_text_mode ? '' : 'hidden'}"><use xlink:href="/images/icons.svg#chevron-down"></use></svg>
+                    <svg class="icon ${this.show_text_mode ? 'hidden' : ''}"><use xlink:href="/images/icons.svg#chevron-right"></use></svg>
+                    Text mode:
+                </span>
+                <div class="${this.show_text_mode ? '' : 'hidden'}">
+                    <input class="text-mode-input" .value='${this.query?this.stringified_query:''}' @change="${this.textModeUpdated}">
                 </div>
             </div>
             <div class="button-group">
@@ -444,6 +479,25 @@ export class AsdbQueryBuilder extends LitElement {
             paginate = this.paginate;
         }
 
+        let categoriesUrl = new URL("/api/v1.0/available_categories", window.location);
+        let category_data = await fetch(categoriesUrl);
+        this.categories.order = await category_data.json();
+        for (let i in this.categories.order.options) {
+            let option = this.categories.order.options[i];
+            console.log("option", i, option);
+            this.categories.mappings[option.value] = {type: option.type, filters: option.filters};
+        }
+        for (let i in this.categories.order.groups) {
+            let group = this.categories.order.groups[i];
+            for (let j in group.options) {
+                let option = group.options[j];
+                console.log("group", i, "option", j, option);
+                this.categories.mappings[option.value] = {type: option.type, filters: option.filters};
+            }
+        }
+
+        console.log(this.categories);
+
         if (terms) {
             let convertUrl = new URL("/api/v1.0/convert", window.location);
             convertUrl.searchParams.set("search_string", terms);
@@ -461,15 +515,11 @@ export class AsdbQueryBuilder extends LitElement {
 
             this.paginate = paginate;
             this.offset = offset;
-            this.runSearch();
+            //this.runSearch();
 
         } else {
             this.query = {
-                terms: {
-                    term_type: "expr",
-                    category: "",
-                    term: "",
-                },
+                terms: new AsdbQueryOperand(),
                 search: 'cluster',
                 return_type: 'json',
             };
@@ -477,17 +527,56 @@ export class AsdbQueryBuilder extends LitElement {
             this.offset = offset;
         }
     }
+
+    get stringified_query() {
+        if (!this._term) {
+            return "INVALID";
+        }
+
+        return this._term.stringify();
+    }
 }
 
 function stringifyTerm(term) {
     if (!term) {
         return "INVALID";
     }
-    if (term.term_type == "expr") {
-        if (!term.category || !term.term) {
-            return "";
+
+    if (term.term_type == "op") {
+        let left_stringify = stringifyTerm(term.left);
+        let right_stringify = stringifyTerm(term.right);
+        if (!left_stringify) {
+            return right_stringify;
         }
-        return `[${term.category}]${term.term}`;
+
+        if (!right_stringify) {
+            return left_stringify;
+        }
+
+        return `( ${left_stringify} ${term.operation} ${right_stringify} )`;
     }
-    return `( ${stringifyTerm(term.left)} ${term.operation} ${stringifyTerm(term.right)} )`;
+
+    let count_str = term.count > 1 ? `${term.count}x` : '';
+
+    if (!term.category) {
+        return "";
+    }
+
+    let stringified = `${count_str}[${term.category}]`;
+
+    if (!term.term) {
+        return stringified;
+    }
+
+    stringified += `{${term.term}}`;
+
+    if (!term.filters) {
+        return stringified;
+    }
+
+    term.filters.map(filter => {
+        stringified += ` WITH [${filter.name}]{${filter.operator}${filter.operand}}`
+    });
+
+    return stringified;
 }
